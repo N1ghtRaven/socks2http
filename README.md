@@ -15,9 +15,7 @@ Building:
 
 Usage:
 
-    socks2http -laddr <http-proxy-address> -raddr <socks-proxy-address>
-
-Then point http proxy users at `<http-proxy-address>`
+    HTTP_HOST=<http-proxy-host> HTTP_PORT=<http-proxy-port> SOCKS_HOST=<socks-proxy-host> SOCKS_PORT=<socks-proxy-port> SOCKS_USER=<socks-proxy-username> SOCKS_PASSWORD=<socks-proxy-password> socks2http
 
 # License
 

@@ -1,17 +1,13 @@
 package main
 
 import (
-	"flag"
-	"golang.org/x/net/proxy"
 	"io"
 	"log"
 	"net"
 	"net/http"
-)
 
-var (
-	laddr = flag.String("laddr", ":8000", "Address to listen on")
-	raddr = flag.String("raddr", ":1080", "Socks proxy address to connect to.")
+	"./config"
+	"golang.org/x/net/proxy"
 )
 
 var (
@@ -30,9 +26,10 @@ func newClient(dialer proxy.Dialer) *http.Client {
 }
 
 func main() {
-	flag.Parse()
+	conf := config.New()
+
 	var err error
-	socks5proxy, err = proxy.SOCKS5("tcp", *raddr, nil, proxy.Direct)
+	socks5proxy, err = proxy.SOCKS5("tcp", conf.SocksProxy.Address, &conf.SocksProxy.Auth, proxy.Direct)
 	if err != nil {
 		panic(err)
 	}
@@ -40,7 +37,6 @@ func main() {
 	hndl := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.Method == "CONNECT" {
 			serverConn, err := socks5proxy.Dial("tcp", req.Host)
-			log.Println("Got server connection")
 			if err != nil {
 				w.WriteHeader(500)
 				w.Write([]byte(err.Error() + "\n"))
@@ -63,23 +59,7 @@ func main() {
 			}
 			go io.Copy(serverConn, bio)
 			go io.Copy(bio, serverConn)
-		} else {
-			// Server-Only field; we get an error fi we pass this to `client.Do`.
-			req.RequestURI = ""
-
-			resp, err := client.Do(req)
-			if err != nil {
-				w.WriteHeader(500)
-				w.Write([]byte(err.Error() + "\n"))
-				return
-			}
-			hdr := w.Header()
-			for k, v := range resp.Header {
-				hdr[k] = v
-			}
-			w.WriteHeader(resp.StatusCode)
-			io.Copy(w, resp.Body)
 		}
 	})
-	log.Fatal(http.ListenAndServe(*laddr, hndl))
+	log.Fatal(http.ListenAndServe(conf.HttpProxy, hndl))
 }
