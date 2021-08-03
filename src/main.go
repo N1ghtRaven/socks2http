@@ -61,5 +61,5 @@ func main() {
 			go io.Copy(bio, serverConn)
 		}
 	})
-	log.Fatal(http.ListenAndServe(conf.HttpProxy, hndl))
+	log.Fatal(http.ListenAndServe("0.0.0.0:8080", hndl))
 }

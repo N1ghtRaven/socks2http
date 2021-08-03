@@ -14,8 +14,24 @@ Building:
     go build
 
 Usage:
+    SOCKS_HOST=<socks-proxy-host> SOCKS_PORT=<socks-proxy-port> SOCKS_USERNAME=<socks-proxy-username> SOCKS_PASSWORD=<socks-proxy-password> socks2http
 
-    HTTP_HOST=<http-proxy-host> HTTP_PORT=<http-proxy-port> SOCKS_HOST=<socks-proxy-host> SOCKS_PORT=<socks-proxy-port> SOCKS_USER=<socks-proxy-username> SOCKS_PASSWORD=<socks-proxy-password> socks2http
+
+docker-compose.yml:
+```yml
+version: "3"
+services:
+    socks2http:
+        build: .
+        image: n1ghtraven/socks2http:golang
+        ports:
+            - 40001:8080
+        environment:  
+            - SOCKS_HOST=127.0.0.1
+            - SOCKS_PORT=1080
+            - SOCKS_USERNAME=user
+            - SOCKS_PASSWORD=password  
+```
 
 # License
 
